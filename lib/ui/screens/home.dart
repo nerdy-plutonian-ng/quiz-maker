@@ -17,9 +17,10 @@ class HomeScreen extends StatelessWidget {
             Text(fire_auth.FirebaseAuth.instance.currentUser?.email ?? 'Crush'),
             ElevatedButton(
                 onPressed: () {
-                  fire_auth.FirebaseAuth.instance
-                      .signOut()
-                      .then((value) => context.go(RoutePaths.root));
+                  fire_auth.FirebaseAuth.instance.signOut().then((value) {
+                    print('blah blah');
+                    context.pushReplacementNamed(RoutePaths.root);
+                  });
                 },
                 child: const Text('Logout'))
           ],

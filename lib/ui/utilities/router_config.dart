@@ -15,7 +15,8 @@ final routerConfig = GoRouter(
         routes: const [],
         redirect: (_, routerState) {
           if (kDebugMode) {
-            print(routerState.location);
+            print(
+                'Redirecting from ${routerState.location} to ${RoutePaths.auth}');
           }
           if (FirebaseAuth.instance.currentUser == null) {
             return RoutePaths.auth;
