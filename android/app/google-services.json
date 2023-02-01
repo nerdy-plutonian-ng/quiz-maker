@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "837571622040",
+    "project_id": "quiz-maker-000",
+    "storage_bucket": "quiz-maker-000.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837571622040:android:6311dc177e8dca1e5d8ced",
+        "android_client_info": {
+          "package_name": "com.plutoapps.quiz_maker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "837571622040-ghr0trria2pk4g2m26dvnn2s668d5e1q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWDLDd-xhls8Litw56zlgcAv79w0yW0hE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "837571622040-ghr0trria2pk4g2m26dvnn2s668d5e1q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "837571622040-2b0sujj1kn5kg5jpqjsh2ot9i4pqtch7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.plutoapps.quiz-maker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
