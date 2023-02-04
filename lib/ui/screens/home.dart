@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart' as fire_auth;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,11 +14,12 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(fire_auth.FirebaseAuth.instance.currentUser?.email ?? 'Crush'),
+            Text(FirebaseAuth.instance.currentUser?.email ?? 'Crush'),
+            Text(
+                'Is email verified? : ${FirebaseAuth.instance.currentUser?.emailVerified}'),
             ElevatedButton(
                 onPressed: () {
-                  fire_auth.FirebaseAuth.instance.signOut().then((value) {
-                    print('blah blah');
+                  FirebaseAuth.instance.signOut().then((value) {
                     context.pushReplacementNamed(RoutePaths.root);
                   });
                 },

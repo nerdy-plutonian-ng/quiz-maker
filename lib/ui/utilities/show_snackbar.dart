@@ -8,7 +8,7 @@ class AppSnackBar {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(
         message,
-        style: const TextStyle(fontSize: 20, color: Colors.white),
+        style: const TextStyle(fontSize: 18, color: Colors.white),
         textAlign: TextAlign.center,
       ),
       backgroundColor: isError

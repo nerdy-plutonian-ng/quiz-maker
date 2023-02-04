@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:quiz_maker/ui/screens/auth.dart';
 import 'package:quiz_maker/ui/utilities/app_extensions.dart';
 import 'package:quiz_maker/ui/utilities/show_snackbar.dart';
 
@@ -25,14 +26,39 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   };
   var isSubmitting = false;
 
-  signIn() {
+  register() {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        isSubmitting = true;
+      });
       FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: registerObject['email']!,
               password: registerObject['password']!)
-          .then((userCredential) {})
-          .catchError((error) {
+          .then((userCredential) {
+        final user = userCredential.user;
+        if (user != null) {
+          user.updateDisplayName(registerObject['displayName']).then((value) {
+            user.sendEmailVerification().then((_) {
+              setState(() {
+                isSubmitting = false;
+              });
+              widget.changeAuthAction(AuthActions.verifyEmail);
+            });
+          }).catchError((error) {
+            setState(() {
+              isSubmitting = false;
+            });
+            AppSnackBar.showSnackBar(
+                context: context,
+                message: error.toString().split(']')[1],
+                isError: true);
+          });
+        }
+      }).catchError((error) {
+        setState(() {
+          isSubmitting = false;
+        });
         AppSnackBar.showSnackBar(
             context: context,
             message: error.toString().split(']')[1],
@@ -61,7 +87,8 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 TextButton(
-                    onPressed: () => widget.changeAuthAction(false),
+                    onPressed: () =>
+                        widget.changeAuthAction(AuthActions.signIn),
                     child: const Text('Sign In'))
               ],
             ),
@@ -142,14 +169,10 @@ class _RegisterWidgetState extends State<RegisterWidget> {
               },
               autovalidateMode: AutovalidateMode.onUserInteraction,
             ),
+            if (isSubmitting) const LinearProgressIndicator(),
             16.vSpace(),
-            if (isSubmitting)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 8.0),
-                child: LinearProgressIndicator(),
-              ),
             FilledButton(
-                onPressed: isSubmitting ? null : signIn,
+                onPressed: isSubmitting ? null : register,
                 child: const Text('Register'))
           ],
         ),

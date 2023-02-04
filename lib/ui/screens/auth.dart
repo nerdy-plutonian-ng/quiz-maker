@@ -2,9 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_maker/ui/widgets/all_set_widget.dart';
 import 'package:quiz_maker/ui/widgets/control_box.dart';
+import 'package:quiz_maker/ui/widgets/forgot_password_widget.dart';
 import 'package:quiz_maker/ui/widgets/register_widget.dart';
 import 'package:quiz_maker/ui/widgets/sign_in_widget.dart';
 import 'package:quiz_maker/ui/widgets/verify_email_widget.dart';
+
+enum AuthActions { register, signIn, forgotPassword, verifyEmail, allSet }
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
@@ -14,14 +17,25 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+  late AuthActions? currentAction;
   User? user;
-  var isRegistering = false;
 
-  changeAuthAction(bool authAction) {
-    print('called : $authAction');
+  changeAuthAction(AuthActions authAction) {
     setState(() {
-      isRegistering = authAction;
+      currentAction = authAction;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    user = FirebaseAuth.instance.currentUser;
+    print('user email is verified ${user?.emailVerified}');
+    if (user != null && !user!.emailVerified) {
+      currentAction = AuthActions.verifyEmail;
+    } else {
+      currentAction = AuthActions.signIn;
+    }
   }
 
   @override
@@ -43,26 +57,34 @@ class _AuthScreenState extends State<AuthScreen> {
               ListTile(
                 leading: const Icon(Icons.info),
                 title: Text(
-                  user == null && isRegistering
+                  currentAction == AuthActions.register
                       ? 'Enter your email and password to create a new account'
-                      : user == null && !isRegistering
+                      : currentAction == AuthActions.signIn
                           ? 'Enter your credentials to sign in'
-                          : !user!.emailVerified
-                              ? 'You have an account but your email is not verified'
-                              : 'You have successfully signed in.',
+                          : currentAction == AuthActions.verifyEmail
+                              ? 'You have an account but your email is not verified. Check your mail.'
+                              : currentAction == AuthActions.forgotPassword
+                                  ? 'Enter your email, we will send a reset link to it.'
+                                  : 'You have successfully signed in.',
                   style: Theme.of(context).textTheme.labelLarge,
                 ),
               ),
               Expanded(
                   child: ListView(
                 children: [
-                  if (user == null && isRegistering)
+                  if (currentAction == AuthActions.register)
                     RegisterWidget(changeAuthAction: changeAuthAction),
-                  if (user == null && !isRegistering)
+                  if (currentAction == AuthActions.signIn)
                     SignInWidget(changeAuthAction: changeAuthAction),
-                  if (user != null && !user!.emailVerified)
-                    const VerifyEmailWidget(),
-                  if (user != null && user!.emailVerified) const AllSetWidget(),
+                  if (currentAction == AuthActions.verifyEmail)
+                    VerifyEmailWidget(
+                      changeAuthAction: changeAuthAction,
+                    ),
+                  if (currentAction == AuthActions.forgotPassword)
+                    ForgotPasswordWidget(
+                      changeAuthAction: changeAuthAction,
+                    ),
+                  if (currentAction == AuthActions.allSet) const AllSetWidget(),
                 ],
               ))
             ],
