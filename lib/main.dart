@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quiz_maker/data/app_state/create_quiz_state.dart';
 import 'package:quiz_maker/data/models/app_settings.dart';
 import 'package:quiz_maker/data/persistence/app_settings_prefs_saver.dart';
 import 'package:quiz_maker/ui/app_theme/color_schemes.g.dart';
@@ -18,6 +19,7 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => AppSettingsState()),
+      ChangeNotifierProvider(create: (_) => CreateQuizState()),
     ],
     child: QuizMaker(
       appSettings: appSettings,
@@ -25,16 +27,26 @@ void main() async {
   ));
 }
 
-class QuizMaker extends StatelessWidget {
+class QuizMaker extends StatefulWidget {
   const QuizMaker({Key? key, this.appSettings}) : super(key: key);
 
   final AppSettingsModel? appSettings;
 
   @override
-  Widget build(BuildContext context) {
+  State<QuizMaker> createState() => _QuizMakerState();
+}
+
+class _QuizMakerState extends State<QuizMaker> {
+  @override
+  void initState() {
+    super.initState();
     Provider.of<AppSettingsState>(context, listen: false).setAppSettings(
-        appSettings ?? AppSettingsModel(isDarkModeOn: false),
+        widget.appSettings ?? AppSettingsModel(isDarkModeOn: false),
         shouldNotify: false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'QuizMaker',
       theme: ThemeData(

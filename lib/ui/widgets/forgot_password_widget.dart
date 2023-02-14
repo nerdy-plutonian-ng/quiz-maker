@@ -63,9 +63,18 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
             ),
             if (isSubmitting) const LinearProgressIndicator(),
             16.vSpace(),
-            FilledButton(
-                onPressed: isSubmitting ? null : resetPassword,
-                child: const Text('Reset Password')),
+            Row(
+              children: [
+                FilledButton(
+                    onPressed: isSubmitting ? null : resetPassword,
+                    child: const Text('Reset Password')),
+                16.hSpace(),
+                OutlinedButton(
+                    onPressed: () =>
+                        widget.changeAuthAction(AuthActions.signIn),
+                    child: const Text('Sign In'))
+              ],
+            ),
           ],
         ),
       ),

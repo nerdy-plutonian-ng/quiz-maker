@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_maker/data/constants/app_dimensions.dart';
 
 class ControlBox extends StatelessWidget {
-  const ControlBox({Key? key, required this.child}) : super(key: key);
+  const ControlBox({Key? key, required this.child, required this.isMobile})
+      : super(key: key);
 
+  final bool isMobile;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
     return Align(
       alignment: Alignment.center,
       child: SizedBox(
-        width: deviceWidth <= AppDimensions.mobileWidth
-            ? double.infinity
-            : AppDimensions.mobileWidth.toDouble(),
+        width: isMobile ? double.infinity : 480,
         child: Align(alignment: Alignment.center, child: child),
       ),
     );

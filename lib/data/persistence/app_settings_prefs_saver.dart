@@ -20,4 +20,10 @@ class AppSettingsPrefsSaver implements AppSettings {
     return prefs.setString(AppStrings.appSettings,
         AppSettingsModel.appSettingsToJson(appSettings));
   }
+
+  @override
+  Future<bool> clear() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.clear();
+  }
 }

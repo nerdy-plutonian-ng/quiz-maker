@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
-
-import '../models/app_settings.dart';
+import 'package:quiz_maker/data/models/app_settings.dart';
 
 class AppSettingsState with ChangeNotifier {
   late AppSettingsModel _appSettings;

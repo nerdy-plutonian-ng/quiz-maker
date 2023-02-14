@@ -1,11 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:quiz_maker/data/constants/route_paths.dart';
 import 'package:quiz_maker/data/models/type_definitions.dart';
 import 'package:quiz_maker/ui/screens/auth.dart';
 import 'package:quiz_maker/ui/utilities/app_extensions.dart';
 import 'package:quiz_maker/ui/utilities/show_snackbar.dart';
+
+import '../../data/constants/route_paths.dart';
 
 class SignInWidget extends StatefulWidget {
   const SignInWidget({Key? key, required this.changeAuthAction})
@@ -38,7 +40,28 @@ class _SignInWidgetState extends State<SignInWidget> {
         final user = userCredential.user;
         if (user != null) {
           if (user.emailVerified) {
-            context.goNamed(RoutePaths.root);
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(FirebaseAuth.instance.currentUser!.email)
+                .get()
+                .then((doc) {
+              if (!doc.exists) {
+                FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(FirebaseAuth.instance.currentUser!.email)
+                    .set({
+                  'account': {
+                    'noQuizzesPlayed': 0,
+                    'noQuizzesWon': 0,
+                    'noPointsAccumulated': 0,
+                  },
+                }).then((value) {
+                  context.goNamed(RoutePaths.root);
+                });
+              } else {
+                context.goNamed(RoutePaths.root);
+              }
+            });
           } else {
             widget.changeAuthAction(AuthActions.verifyEmail);
           }
