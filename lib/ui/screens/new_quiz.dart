@@ -195,9 +195,25 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
                                   (context, index) => Card(
                                         child: ListTile(
                                           onTap: () {
-                                            setState(() {
-                                              selectedQuestion = index;
-                                            });
+                                            if (deviceWidth <=
+                                                AppDimensions
+                                                    .portraitTabletWidth) {
+                                              Provider.of<CreateQuizState>(
+                                                      context,
+                                                      listen: false)
+                                                  .selectIndex(index);
+                                              context.pushNamed(
+                                                  RoutePaths.newQuestion,
+                                                  queryParams: {
+                                                    'question': jsonEncode(
+                                                        quizQuestions
+                                                            .questions[index])
+                                                  });
+                                            } else {
+                                              setState(() {
+                                                selectedQuestion = index;
+                                              });
+                                            }
                                           },
                                           title: Text(quizQuestions
                                               .questions[index]['title']),
