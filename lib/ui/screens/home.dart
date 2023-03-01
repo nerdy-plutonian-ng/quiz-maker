@@ -3,10 +3,11 @@ import 'package:quiz_maker/data/constants/app_dimensions.dart';
 import 'package:quiz_maker/data/local_data/home_nav_menu.dart';
 import 'package:quiz_maker/ui/widgets/control_box.dart';
 import 'package:quiz_maker/ui/widgets/home.dart';
+import 'package:quiz_maker/ui/widgets/play.dart';
 import 'package:quiz_maker/ui/widgets/profile.dart';
 import 'package:quiz_maker/ui/widgets/stats.dart';
 
-const tabs = [HomeWidget(), StatsWidget(), ProfileWidget()];
+const tabs = [HomeWidget(), PlayWidget(), StatsWidget(), ProfileWidget()];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_maker/ui/widgets/dark_mode_widget.dart';
+import 'package:quiz_maker/ui/widgets/delete_account.dart';
 import 'package:quiz_maker/ui/widgets/logout.dart';
 
 class ProfileWidget extends StatefulWidget {
@@ -31,6 +32,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
         ),
         const LogoutWidget(),
+        const Divider(),
+        const DeleteAccount(),
       ],
     );
   }

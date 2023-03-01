@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quiz_maker/data/models/type_definitions.dart';
 import 'package:quiz_maker/ui/screens/auth.dart';
 import 'package:quiz_maker/ui/utilities/app_extensions.dart';
-import 'package:quiz_maker/ui/utilities/show_snackbar.dart';
+import 'package:quiz_maker/ui/utilities/messager.dart';
 
 import '../../data/constants/route_paths.dart';
 
@@ -26,7 +26,7 @@ class _SignInWidgetState extends State<SignInWidget> {
 
   final credentials = {'email': '', 'password': ''};
 
-  var isPasswordVisible = false;
+  var isPasswordVisible = true;
 
   signIn() {
     if (_formKey.currentState!.validate()) {
@@ -53,6 +53,7 @@ class _SignInWidgetState extends State<SignInWidget> {
                   'account': {
                     'noQuizzesPlayed': 0,
                     'noQuizzesWon': 0,
+                    'noSoloQuizzesPlayed': 0,
                     'noPointsAccumulated': 0,
                   },
                 }).then((value) {
@@ -69,7 +70,7 @@ class _SignInWidgetState extends State<SignInWidget> {
       }).catchError((onError) {
         setState(() {
           isSigningIn = false;
-          AppSnackBar.showSnackBar(
+          Messager.showSnackBar(
               context: context,
               message: onError.toString().split(']')[1],
               isError: true);

@@ -6,7 +6,7 @@ import 'dart:convert';
 
 class AppSettingsModel {
   AppSettingsModel({
-    required this.isDarkModeOn,
+    this.isDarkModeOn = false,
   });
 
   final bool isDarkModeOn;

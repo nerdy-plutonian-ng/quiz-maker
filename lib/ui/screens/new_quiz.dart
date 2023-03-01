@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:quiz_maker/data/app_state/create_quiz_state.dart';
 import 'package:quiz_maker/data/constants/route_paths.dart';
 import 'package:quiz_maker/ui/utilities/app_extensions.dart';
-import 'package:quiz_maker/ui/utilities/show_snackbar.dart';
+import 'package:quiz_maker/ui/utilities/messager.dart';
 import 'package:quiz_maker/ui/widgets/question_view.dart';
 
 import '../../data/constants/app_dimensions.dart';
@@ -40,13 +40,14 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
       if (Provider.of<CreateQuizState>(context, listen: false)
           .questions
           .isEmpty) {
-        AppSnackBar.showSnackBar(
+        Messager.showSnackBar(
             context: context,
             message: 'Your quiz has no questions',
             isError: true);
         return;
       }
       final newQuiz = {
+        'userId': FirebaseAuth.instance.currentUser?.uid,
         'title': stagedQuiz['title'],
         'questions':
             Provider.of<CreateQuizState>(context, listen: false).questions,
@@ -62,7 +63,7 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
             .collection('quizzes')
             .add(newQuiz)
             .then((value) {
-          AppSnackBar.showSnackBar(
+          Messager.showSnackBar(
             context: context,
             message: 'Successfully added',
           );
@@ -71,7 +72,7 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
           setState(() {
             isPosting = false;
           });
-          AppSnackBar.showSnackBar(
+          Messager.showSnackBar(
               context: context, message: error.toString(), isError: true);
         });
       } else {
@@ -82,7 +83,7 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
             .doc(id)
             .set(newQuiz)
             .then((value) {
-          AppSnackBar.showSnackBar(
+          Messager.showSnackBar(
             context: context,
             message: 'Successfully updated',
           );
@@ -91,7 +92,7 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
           setState(() {
             isPosting = false;
           });
-          AppSnackBar.showSnackBar(
+          Messager.showSnackBar(
               context: context, message: error.toString(), isError: true);
         });
       }
@@ -192,31 +193,64 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
                         if (quizQuestions.questions.isNotEmpty)
                           SliverList(
                               delegate: SliverChildBuilderDelegate(
-                                  (context, index) => Card(
-                                        child: ListTile(
-                                          onTap: () {
-                                            if (deviceWidth <=
-                                                AppDimensions
-                                                    .portraitTabletWidth) {
-                                              Provider.of<CreateQuizState>(
-                                                      context,
-                                                      listen: false)
-                                                  .selectIndex(index);
-                                              context.pushNamed(
-                                                  RoutePaths.newQuestion,
-                                                  queryParams: {
-                                                    'question': jsonEncode(
-                                                        quizQuestions
-                                                            .questions[index])
-                                                  });
-                                            } else {
-                                              setState(() {
-                                                selectedQuestion = index;
-                                              });
-                                            }
-                                          },
-                                          title: Text(quizQuestions
-                                              .questions[index]['title']),
+                                  (context, index) => Dismissible(
+                                        direction: DismissDirection.endToStart,
+                                        confirmDismiss: (_) =>
+                                            Messager.confirmDelete(
+                                                context,
+                                                quizQuestions.questions[index]
+                                                    ['title']),
+                                        onDismissed: (_) {
+                                          quizQuestions.removeQuestion(index);
+                                        },
+                                        background: Container(
+                                          color: Colors.red,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: const [
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    right: 16.0),
+                                                child: Text(
+                                                  'Delete',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 18),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        key: Key(index.toString()),
+                                        child: Card(
+                                          child: ListTile(
+                                            onTap: () {
+                                              if (deviceWidth <=
+                                                  AppDimensions
+                                                      .portraitTabletWidth) {
+                                                Provider.of<CreateQuizState>(
+                                                        context,
+                                                        listen: false)
+                                                    .selectIndex(index);
+                                                context.pushNamed(
+                                                    RoutePaths.newQuestion,
+                                                    queryParams: {
+                                                      'question': jsonEncode(
+                                                          quizQuestions
+                                                              .questions[index])
+                                                    });
+                                              } else {
+                                                setState(() {
+                                                  selectedQuestion = index;
+                                                });
+                                              }
+                                            },
+                                            title: Text(quizQuestions
+                                                .questions[index]['title']),
+                                          ),
                                         ),
                                       ),
                                   childCount: quizQuestions.questions.length)),

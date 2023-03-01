@@ -1,7 +1,11 @@
+import 'dart:ui';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_maker/data/app_state/create_quiz_state.dart';
+import 'package:quiz_maker/data/app_state/single_quiz_state.dart';
 import 'package:quiz_maker/data/models/app_settings.dart';
 import 'package:quiz_maker/data/persistence/app_settings_prefs_saver.dart';
 import 'package:quiz_maker/ui/app_theme/color_schemes.g.dart';
@@ -15,11 +19,20 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
   final appSettings = await AppSettingsPrefsSaver().getAppSettings();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => AppSettingsState()),
       ChangeNotifierProvider(create: (_) => CreateQuizState()),
+      ChangeNotifierProvider(create: (_) => SingleQuizState()),
     ],
     child: QuizMaker(
       appSettings: appSettings,
@@ -41,13 +54,14 @@ class _QuizMakerState extends State<QuizMaker> {
   void initState() {
     super.initState();
     Provider.of<AppSettingsState>(context, listen: false).setAppSettings(
-        widget.appSettings ?? AppSettingsModel(isDarkModeOn: false),
+        widget.appSettings ?? AppSettingsModel(),
         shouldNotify: false);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       title: 'QuizMaker',
       theme: ThemeData(
           useMaterial3: true,

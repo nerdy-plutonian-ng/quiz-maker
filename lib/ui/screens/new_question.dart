@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:quiz_maker/data/app_state/create_quiz_state.dart';
 import 'package:quiz_maker/data/constants/app_dimensions.dart';
 import 'package:quiz_maker/ui/utilities/app_extensions.dart';
-import 'package:quiz_maker/ui/utilities/show_snackbar.dart';
+import 'package:quiz_maker/ui/utilities/messager.dart';
 import 'package:quiz_maker/ui/widgets/app_text_field.dart';
 import 'package:quiz_maker/ui/widgets/control_box.dart';
 
@@ -30,10 +30,12 @@ class _NewQuestionScreenState extends State<NewQuestionScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
+  late TextEditingController questionTEC;
+
   addEditQuestion() {
     if (_formKey.currentState!.validate()) {
       if (stagedQuestion['answer'] == -1) {
-        AppSnackBar.showSnackBar(
+        Messager.showSnackBar(
             context: context, message: 'Select an answer', isError: true);
         return;
       }
@@ -49,12 +51,19 @@ class _NewQuestionScreenState extends State<NewQuestionScreen> {
   }
 
   @override
+  void dispose() {
+    questionTEC.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     question = jsonDecode(widget.params['question']!);
     stagedQuestion = {...question};
     indices = List<int>.generate(
         (stagedQuestion['choices'] as List).length, (index) => index);
+    questionTEC = TextEditingController(text: stagedQuestion['title']);
   }
 
   @override
@@ -81,10 +90,9 @@ class _NewQuestionScreenState extends State<NewQuestionScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: AppTextField(
+                          controller: questionTEC,
                           maxLength: 50,
-                          initialValue: question['title'],
                           label: 'Question',
-                          lines: 2,
                           textInputAction: TextInputAction.done,
                           onChange: (text) {
                             stagedQuestion['title'] = text;
@@ -106,10 +114,9 @@ class _NewQuestionScreenState extends State<NewQuestionScreen> {
                         children: [
                           if (deviceWidth <= AppDimensions.portraitTabletWidth)
                             AppTextField(
+                              controller: questionTEC,
                               maxLength: 50,
-                              initialValue: question['title'],
                               label: 'Question',
-                              lines: 2,
                               textInputAction: TextInputAction.done,
                               onChange: (text) {
                                 stagedQuestion['title'] = text;
@@ -132,6 +139,7 @@ class _NewQuestionScreenState extends State<NewQuestionScreen> {
                                 }
                               },
                               title: AppTextField(
+                                maxLength: 50,
                                 initialValue: question['choices'][index],
                                 label: 'Choice ${index + 1}',
                                 textInputAction: TextInputAction.done,

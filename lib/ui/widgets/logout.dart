@@ -29,8 +29,9 @@ class LogoutWidget extends StatelessWidget {
           });
         },
         // title: const Text('Sign out'),
-        title: Text(FirebaseAuth.instance.currentUser?.displayName ?? 'N/A'),
-        subtitle: Text(FirebaseAuth.instance.currentUser?.email ?? 'N/A'),
+        title: const Text('Log out'),
+        subtitle: Text(
+            '${FirebaseAuth.instance.currentUser?.displayName ?? 'N/A'} - ${FirebaseAuth.instance.currentUser?.email ?? 'N/A'}'),
         trailing: const Icon(Icons.logout),
       ),
     );

@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_maker/ui/screens/auth.dart';
 import 'package:quiz_maker/ui/utilities/app_extensions.dart';
-import 'package:quiz_maker/ui/utilities/show_snackbar.dart';
+import 'package:quiz_maker/ui/utilities/messager.dart';
 
 import '../../data/models/type_definitions.dart';
 
@@ -49,7 +49,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             setState(() {
               isSubmitting = false;
             });
-            AppSnackBar.showSnackBar(
+            Messager.showSnackBar(
                 context: context,
                 message: error.toString().split(']')[1],
                 isError: true);
@@ -59,7 +59,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         setState(() {
           isSubmitting = false;
         });
-        AppSnackBar.showSnackBar(
+        Messager.showSnackBar(
             context: context,
             message: error.toString().split(']')[1],
             isError: true);

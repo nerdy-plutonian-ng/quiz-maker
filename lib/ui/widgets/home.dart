@@ -82,20 +82,78 @@ class _HomeWidgetState extends State<HomeWidget> {
                   Expanded(
                       child: ListView.builder(
                     itemBuilder: (_, index) {
-                      return ListTile(
-                        onTap: () {
-                          Provider.of<CreateQuizState>(context, listen: false)
-                              .setQuestions(
-                                  (quizzes[index].data()['questions'] as List)
-                                      .map((e) => e as Map<String, dynamic>)
-                                      .toList());
-                          context.pushNamed(RoutePaths.newQuiz, queryParams: {
-                            'quiz': jsonEncode(quizzes[index].data()),
-                            'id': quizzes[index].id
-                          });
+                      return Dismissible(
+                        key: UniqueKey(),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: Colors.red,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: const [
+                              Padding(
+                                padding: EdgeInsets.only(right: 16.0),
+                                child: Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        onDismissed: (_) {
+                          quizzes.removeAt(index);
                         },
-                        title: Text(quizzes[index].data()['title']),
-                        trailing: const Icon(Icons.navigate_next),
+                        confirmDismiss: (_) async {
+                          await showDialog<bool>(
+                                  context: context,
+                                  builder: (_) {
+                                    return AlertDialog(
+                                      title: const Text('Confirm Delete'),
+                                      content:
+                                          Text(quizzes[index].data()['title']),
+                                      actions: [
+                                        FilledButton(
+                                            onPressed: () {
+                                              FirebaseFirestore.instance
+                                                  .collection('users')
+                                                  .doc(FirebaseAuth.instance
+                                                      .currentUser!.email)
+                                                  .collection('quizzes')
+                                                  .doc(quizzes[index].id)
+                                                  .delete()
+                                                  .then((_) {
+                                                Navigator.pop(context, true);
+                                              });
+                                            },
+                                            child: const Text('Delete')),
+                                        FilledButton.tonal(
+                                            onPressed: () {
+                                              Navigator.pop(context, false);
+                                            },
+                                            child: const Text('Cancel')),
+                                      ],
+                                    );
+                                  }) ??
+                              false;
+                        },
+                        child: ListTile(
+                          onTap: () {
+                            Provider.of<CreateQuizState>(context, listen: false)
+                                .setQuestions(
+                                    (quizzes[index].data()['questions'] as List)
+                                        .map((e) => e as Map<String, dynamic>)
+                                        .toList());
+                            context.pushNamed(RoutePaths.newQuiz, queryParams: {
+                              'quiz': jsonEncode(quizzes[index].data()),
+                              'id': quizzes[index].id
+                            });
+                          },
+                          title: Text(quizzes[index].data()['title']),
+                          trailing: const Icon(Icons.navigate_next),
+                        ),
                       );
                     },
                     itemCount: quizzes.length,

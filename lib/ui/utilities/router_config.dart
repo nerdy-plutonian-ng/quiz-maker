@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quiz_maker/ui/screens/auth.dart';
 import 'package:quiz_maker/ui/screens/new_question.dart';
 import 'package:quiz_maker/ui/screens/new_quiz.dart';
+import 'package:quiz_maker/ui/screens/play_quiz.dart';
 
 import '../../data/constants/route_paths.dart';
 import '../screens/home.dart';
@@ -26,6 +27,11 @@ final routerConfig = GoRouter(
             builder: (_, routerState) => NewQuestionScreen(
               params: routerState.queryParams,
             ),
+          ),
+          GoRoute(
+            path: RoutePaths.playQuiz,
+            name: RoutePaths.playQuiz,
+            builder: (_, routerState) => const PlayQuizWidget(),
           ),
         ],
         redirect: (_, routerState) {

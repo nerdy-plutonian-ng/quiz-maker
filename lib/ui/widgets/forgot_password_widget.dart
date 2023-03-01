@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:quiz_maker/data/models/type_definitions.dart';
 import 'package:quiz_maker/ui/screens/auth.dart';
 import 'package:quiz_maker/ui/utilities/app_extensions.dart';
-import 'package:quiz_maker/ui/utilities/show_snackbar.dart';
+import 'package:quiz_maker/ui/utilities/messager.dart';
 
 class ForgotPasswordWidget extends StatefulWidget {
   const ForgotPasswordWidget({Key? key, required this.changeAuthAction})
@@ -30,7 +30,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
           isSubmitting = false;
         });
         widget.changeAuthAction(AuthActions.signIn);
-        AppSnackBar.showSnackBar(
+        Messager.showSnackBar(
             context: context,
             message: 'Check your mail for a password reset link');
       });
