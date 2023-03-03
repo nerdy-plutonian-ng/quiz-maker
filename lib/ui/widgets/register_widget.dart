@@ -118,7 +118,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                 suffixIcon: Icon(Icons.alternate_email),
               ),
               onChanged: (text) {
-                registerObject['email'] = text;
+                registerObject['email'] = text.toLowerCase();
               },
               validator: (text) {
                 if (text == null || text.isEmpty) {

@@ -112,7 +112,7 @@ class _SignInWidgetState extends State<SignInWidget> {
                 suffixIcon: Icon(Icons.alternate_email),
               ),
               onChanged: (text) {
-                credentials['email'] = text;
+                credentials['email'] = text.toLowerCase();
               },
               validator: (text) {
                 if (text == null || text.isEmpty) {

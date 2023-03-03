@@ -81,7 +81,7 @@ class _PlayWidgetState extends State<PlayWidget> {
             controller: controller,
             enabled: !isSearching,
             placeholder: 'Email of quiz maker',
-            onSubmitted: (query) => searchUserQuizzes(query),
+            onSubmitted: (query) => searchUserQuizzes(query.toLowerCase()),
             onSuffixTap: () {
               setState(() {
                 docs = null;
