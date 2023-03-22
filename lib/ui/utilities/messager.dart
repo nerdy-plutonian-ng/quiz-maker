@@ -8,11 +8,17 @@ class Messager {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(
         message,
-        style: const TextStyle(fontSize: 18, color: Colors.white),
+        style: TextStyle(
+          fontSize: 18,
+          color: isError
+              ? Theme.of(context).colorScheme.onError
+              : Theme.of(context).colorScheme.onPrimary,
+        ),
         textAlign: TextAlign.center,
       ),
-      backgroundColor:
-          isError ? Colors.red : Theme.of(context).colorScheme.secondary,
+      backgroundColor: isError
+          ? Theme.of(context).colorScheme.error
+          : Theme.of(context).colorScheme.primary,
     ));
   }
 

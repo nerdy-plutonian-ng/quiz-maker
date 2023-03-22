@@ -26,7 +26,9 @@ class _PlayWidgetState extends State<PlayWidget> {
       isSearching = true;
       docs = null;
     });
-    if (query == FirebaseAuth.instance.currentUser!.email) {
+    if (query == FirebaseAuth.instance.currentUser!.email ||
+        query ==
+            FirebaseAuth.instance.currentUser!.displayName?.toLowerCase()) {
       setState(() {
         isSearching = false;
       });
@@ -109,18 +111,51 @@ class _PlayWidgetState extends State<PlayWidget> {
               itemBuilder: (_, index) {
                 final quiz = docs![index].data() as Map<String, dynamic>;
                 return Card(
-                  child: ListTile(
-                    onTap: () {
-                      Provider.of<SingleQuizState>(context, listen: false)
-                          .reset();
-                      Provider.of<SingleQuizState>(context, listen: false)
-                          .setQuiz(quiz);
-                      context.pushNamed(
-                        RoutePaths.playQuiz,
-                      );
-                    },
-                    title: Text(quiz['title']),
-                    trailing: const Icon(Icons.navigate_next),
+                  key: UniqueKey(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          quiz['title'],
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const Divider(),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            FilledButton.icon(
+                              onPressed: () {
+                                Provider.of<SingleQuizState>(context,
+                                        listen: false)
+                                    .reset();
+                                Provider.of<SingleQuizState>(context,
+                                        listen: false)
+                                    .setQuiz(quiz);
+                                context.pushNamed(
+                                  RoutePaths.playQuiz,
+                                );
+                              },
+                              style: FilledButton.styleFrom(
+                                  visualDensity: VisualDensity.compact),
+                              icon: const Icon(Icons.play_circle_outline),
+                              label: const Text('Solo'),
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            FilledButton.tonalIcon(
+                                onPressed: () {},
+                                style: FilledButton.styleFrom(
+                                    visualDensity: VisualDensity.compact),
+                                icon: const Icon(Icons.play_circle_outline),
+                                label: const Text('Group')),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

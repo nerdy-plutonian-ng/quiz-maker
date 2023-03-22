@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_maker/data/app_state/single_quiz_state.dart';
-import 'package:quiz_maker/data/constants/app_dimensions.dart';
 import 'package:quiz_maker/ui/utilities/app_extensions.dart';
 import 'package:quiz_maker/ui/widgets/control_box.dart';
 
@@ -32,7 +31,6 @@ class _QuizWidgetState extends State<QuizWidget> {
           Expanded(
               flex: 2,
               child: ControlBox(
-                isMobile: deviceWidth <= AppDimensions.mobileWidth,
                 child: ListView(
                   children: [
                     Row(

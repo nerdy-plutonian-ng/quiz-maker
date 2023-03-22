@@ -52,7 +52,8 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
         'questions':
             Provider.of<CreateQuizState>(context, listen: false).questions,
       };
-      //print(newQuiz);
+      print(newQuiz);
+      return;
       setState(() {
         isPosting = true;
       });
@@ -144,23 +145,53 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
                 children: [
                   Expanded(
                       child: ControlBox(
-                    isMobile: deviceWidth <= AppDimensions.mobileWidth,
                     child: CustomScrollView(
                       slivers: [
                         SliverToBoxAdapter(
                           child: Card(
+                            color:
+                                Theme.of(context).colorScheme.tertiaryContainer,
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
                               child: Form(
                                 key: _formKey,
-                                child: AppTextField(
-                                  textInputAction: TextInputAction.done,
-                                  initialValue: quiz['title'],
-                                  label: 'Quiz Title',
-                                  maxLength: 50,
-                                  onChange: (text) {
-                                    stagedQuiz['title'] = text;
-                                  },
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        'Info',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onTertiaryContainer),
+                                      ),
+                                    ),
+                                    AppTextField(
+                                      textInputAction: TextInputAction.next,
+                                      initialValue: quiz['title'],
+                                      label: 'Quiz Title',
+                                      maxLength: 50,
+                                      onChange: (text) {
+                                        stagedQuiz['title'] = text;
+                                      },
+                                    ),
+                                    AppTextField(
+                                      textInputAction: TextInputAction.done,
+                                      initialValue: quiz['description'],
+                                      label: 'Description',
+                                      maxLength: 140,
+                                      onChange: (text) {
+                                        stagedQuiz['description'] = text;
+                                      },
+                                    ),
+                                    8.vSpace()
+                                  ],
                                 ),
                               ),
                             ),
@@ -168,28 +199,30 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
                         ),
                         SliverToBoxAdapter(child: 16.vSpace()),
                         SliverToBoxAdapter(
+                          child: Card(
                             child: ListTile(
-                          title: const Text('Questions'),
-                          subtitle: quizQuestions.questions.isEmpty
-                              ? const Text('You have not added questions yet')
-                              : null,
-                          trailing: IconButton(
-                            onPressed: () {
-                              Provider.of<CreateQuizState>(context,
-                                      listen: false)
-                                  .resetIndex();
-                              context.pushNamed(RoutePaths.newQuestion,
-                                  queryParams: {
-                                    'question': jsonEncode({
-                                      'title': '',
-                                      'choices': ['', '', '', ''],
-                                      'answer': -1,
-                                    })
-                                  });
-                            },
-                            icon: const Icon(Icons.add),
+                              onTap: () {
+                                Provider.of<CreateQuizState>(context,
+                                        listen: false)
+                                    .resetIndex();
+                                context.pushNamed(RoutePaths.newQuestion,
+                                    queryParams: {
+                                      'question': jsonEncode({
+                                        'title': '',
+                                        'choices': ['', '', '', ''],
+                                        'answer': -1,
+                                      })
+                                    });
+                              },
+                              title: const Text('Questions'),
+                              subtitle: quizQuestions.questions.isEmpty
+                                  ? const Text(
+                                      'You have not added questions yet')
+                                  : null,
+                              trailing: const Icon(Icons.add_circle),
+                            ),
                           ),
-                        )),
+                        ),
                         if (quizQuestions.questions.isNotEmpty)
                           SliverList(
                               delegate: SliverChildBuilderDelegate(
@@ -258,15 +291,16 @@ class _NewQuizScreenState extends State<NewQuizScreen> {
                     ),
                   )),
                   if (deviceWidth > AppDimensions.portraitTabletWidth)
-                    const VerticalDivider(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: const VerticalDivider(),
+                    ),
                   if (deviceWidth > AppDimensions.portraitTabletWidth)
                     Expanded(
                         flex: 2,
                         child: selectedQuestion == -1
                             ? Container()
                             : ControlBox(
-                                isMobile:
-                                    deviceWidth <= AppDimensions.mobileWidth,
                                 child: QuestionViewWidget(
                                     question: quizQuestions
                                         .questions[selectedQuestion],

@@ -5,6 +5,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_maker/data/app_state/create_quiz_state.dart';
+import 'package:quiz_maker/data/app_state/quiz_state.dart';
+import 'package:quiz_maker/data/app_state/send_verification_timer_state.dart';
 import 'package:quiz_maker/data/app_state/single_quiz_state.dart';
 import 'package:quiz_maker/data/models/app_settings.dart';
 import 'package:quiz_maker/data/persistence/app_settings_prefs_saver.dart';
@@ -30,7 +32,9 @@ void main() async {
   final appSettings = await AppSettingsPrefsSaver().getAppSettings();
   runApp(MultiProvider(
     providers: [
+      ChangeNotifierProvider(create: (_) => SendVerificationTimerState()),
       ChangeNotifierProvider(create: (_) => AppSettingsState()),
+      ChangeNotifierProvider(create: (_) => QuizState()),
       ChangeNotifierProvider(create: (_) => CreateQuizState()),
       ChangeNotifierProvider(create: (_) => SingleQuizState()),
     ],
@@ -56,6 +60,8 @@ class _QuizMakerState extends State<QuizMaker> {
     Provider.of<AppSettingsState>(context, listen: false).setAppSettings(
         widget.appSettings ?? AppSettingsModel(),
         shouldNotify: false);
+    Provider.of<SendVerificationTimerState>(context, listen: false)
+        .getNextTime();
   }
 
   @override

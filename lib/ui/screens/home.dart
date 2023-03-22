@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: deviceWidth <= AppDimensions.portraitTabletWidth,
         title: const Text('Quiz Maker'),
       ),
       body: SafeArea(
@@ -54,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 const VerticalDivider(),
               Expanded(
                   child: ControlBox(
-                isMobile: deviceWidth <= AppDimensions.mobileWidth,
                 child: tabs[_selectedIndex],
               ))
             ],

@@ -1,15 +1,14 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:quiz_maker/data/app_state/create_quiz_state.dart';
-import 'package:quiz_maker/data/constants/app_dimensions.dart';
+import 'package:quiz_maker/data/app_state/quiz_state.dart';
 import 'package:quiz_maker/data/constants/route_paths.dart';
 import 'package:quiz_maker/ui/utilities/app_extensions.dart';
 import 'package:quiz_maker/ui/widgets/control_box.dart';
+
+import '../utilities/messager.dart';
 
 class HomeWidget extends StatefulWidget {
   const HomeWidget({Key? key}) : super(key: key);
@@ -19,24 +18,20 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> {
-  late Stream<QuerySnapshot<Map<String, dynamic>>> accountStream;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> accountStream;
 
   @override
   void initState() {
     super.initState();
     accountStream = FirebaseFirestore.instance
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.email)
-        .collection('quizzes')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
         .snapshots();
   }
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
-
     return ControlBox(
-      isMobile: deviceWidth <= AppDimensions.mobileWidth,
       child: StreamBuilder(
           stream: accountStream,
           builder: (_, snapshot) {
@@ -46,7 +41,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                   child: CircularProgressIndicator(),
                 );
               }
-              final quizzes = snapshot.data!.docs;
+              final quizzes = snapshot.data!.data()?['quizzes'] as List? ?? [];
 
               return Column(
                 children: [
@@ -58,29 +53,27 @@ class _HomeWidgetState extends State<HomeWidget> {
                         subtitle: quizzes.isEmpty
                             ? const Text('You have no quizzes')
                             : null,
-                        trailing: FilledButton.icon(
-                            style: FilledButton.styleFrom(
-                                visualDensity: VisualDensity.compact),
-                            onPressed: () {
-                              Provider.of<CreateQuizState>(context,
-                                      listen: false)
-                                  .setQuestions(<Map<String, dynamic>>[]);
-                              context
-                                  .pushNamed(RoutePaths.newQuiz, queryParams: {
-                                'quiz': jsonEncode({
-                                  'title': '',
-                                  'questions': <Map<String, dynamic>>[],
-                                })
-                              });
-                            },
-                            icon: const Icon(Icons.add),
-                            label: const Text('New quiz')),
+                        trailing: SizedBox(
+                          child: FilledButton.icon(
+                              style: FilledButton.styleFrom(
+                                  visualDensity: VisualDensity.compact),
+                              onPressed: () {
+                                Provider.of<QuizState>(context, listen: false)
+                                    .reset();
+                                context.pushNamed(
+                                  RoutePaths.quiz,
+                                );
+                              },
+                              icon: const Icon(Icons.add),
+                              label: const Text('New quiz')),
+                        ),
                       ),
                     ),
                   ),
                   16.vSpace(),
                   Expanded(
-                      child: ListView.builder(
+                      child: ListView.separated(
+                    separatorBuilder: (_, __) => const Divider(),
                     itemBuilder: (_, index) {
                       return Dismissible(
                         key: UniqueKey(),
@@ -112,20 +105,54 @@ class _HomeWidgetState extends State<HomeWidget> {
                                   builder: (_) {
                                     return AlertDialog(
                                       title: const Text('Confirm Delete'),
-                                      content:
-                                          Text(quizzes[index].data()['title']),
+                                      content: Text(quizzes[index]['title']),
                                       actions: [
                                         FilledButton(
                                             onPressed: () {
                                               FirebaseFirestore.instance
-                                                  .collection('users')
-                                                  .doc(FirebaseAuth.instance
-                                                      .currentUser!.email)
                                                   .collection('quizzes')
-                                                  .doc(quizzes[index].id)
+                                                  .doc(quizzes[index]['id'])
                                                   .delete()
                                                   .then((_) {
-                                                Navigator.pop(context, true);
+                                                FirebaseFirestore.instance
+                                                    .collection('users')
+                                                    .doc(FirebaseAuth.instance
+                                                        .currentUser!.uid)
+                                                    .get()
+                                                    .then((doc) {
+                                                  final account = {
+                                                    ...?doc.data()
+                                                  };
+                                                  final quizzes = account[
+                                                          'quizzes'] ??
+                                                      <Map<String, String?>>[];
+                                                  final deleteIndex = (quizzes
+                                                          as List)
+                                                      .indexWhere((element) =>
+                                                          element['id'] ==
+                                                          quizzes[index]['id']);
+                                                  quizzes.removeAt(deleteIndex);
+                                                  account['quizzes'] = quizzes;
+                                                  FirebaseFirestore.instance
+                                                      .collection('users')
+                                                      .doc(FirebaseAuth.instance
+                                                          .currentUser!.uid)
+                                                      .update(account)
+                                                      .then((value) {
+                                                    Messager.showSnackBar(
+                                                      context: context,
+                                                      message:
+                                                          'Quiz deleted successfully',
+                                                    );
+                                                    context.pop();
+                                                  });
+                                                }).catchError((e) {
+                                                  Messager.showSnackBar(
+                                                      context: context,
+                                                      message:
+                                                          'Error deleting quiz, try again',
+                                                      isError: true);
+                                                });
                                               });
                                             },
                                             child: const Text('Delete')),
@@ -141,17 +168,10 @@ class _HomeWidgetState extends State<HomeWidget> {
                         },
                         child: ListTile(
                           onTap: () {
-                            Provider.of<CreateQuizState>(context, listen: false)
-                                .setQuestions(
-                                    (quizzes[index].data()['questions'] as List)
-                                        .map((e) => e as Map<String, dynamic>)
-                                        .toList());
-                            context.pushNamed(RoutePaths.newQuiz, queryParams: {
-                              'quiz': jsonEncode(quizzes[index].data()),
-                              'id': quizzes[index].id
-                            });
+                            context.pushNamed(RoutePaths.quiz,
+                                queryParams: {'id': quizzes[index]['id']});
                           },
-                          title: Text(quizzes[index].data()['title']),
+                          title: Text(quizzes[index]['title']),
                           trailing: const Icon(Icons.navigate_next),
                         ),
                       );
@@ -171,8 +191,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                         setState(() {
                           accountStream = FirebaseFirestore.instance
                               .collection('users')
-                              .doc(FirebaseAuth.instance.currentUser!.email)
-                              .collection('quizzes')
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
                               .snapshots();
                         });
                       },

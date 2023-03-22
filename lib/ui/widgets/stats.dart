@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/constants/app_dimensions.dart';
 import 'control_box.dart';
 
 class StatsWidget extends StatefulWidget {
@@ -20,7 +19,7 @@ class _StatsWidgetState extends State<StatsWidget> {
     super.initState();
     accountStream = FirebaseFirestore.instance
         .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.email)
+        .doc(FirebaseAuth.instance.currentUser!.uid)
         .snapshots();
   }
 
@@ -29,7 +28,6 @@ class _StatsWidgetState extends State<StatsWidget> {
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return ControlBox(
-      isMobile: deviceWidth <= AppDimensions.mobileWidth,
       child: StreamBuilder(
           stream: accountStream,
           builder: (_, snapshot) {
@@ -39,7 +37,9 @@ class _StatsWidgetState extends State<StatsWidget> {
                   child: CircularProgressIndicator(),
                 );
               }
-              final account = snapshot.data!.data()!['account'];
+              final account = snapshot.data!.data()!;
+              print('--------');
+              print(snapshot.data!.data());
 
               return ListView(
                 children: [
@@ -62,7 +62,14 @@ class _StatsWidgetState extends State<StatsWidget> {
                           ),
                         ),
                         ListTile(
-                          title: const Text('Number of quizzes won'),
+                          title: const Text('Number of solo quizzes played'),
+                          trailing: Text(
+                            (account['noSoloQuizzesPlayed'] as int).toString(),
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        ListTile(
+                          title: const Text('Number of group quizzes won'),
                           trailing: Text(
                             (account['noQuizzesWon'] as int).toString(),
                             style: Theme.of(context).textTheme.titleMedium,
@@ -72,6 +79,13 @@ class _StatsWidgetState extends State<StatsWidget> {
                           title: const Text('Number of points accumulated'),
                           trailing: Text(
                             (account['noPointsAccumulated'] as int).toString(),
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        ListTile(
+                          title: const Text('Times others played your quizzes'),
+                          trailing: Text(
+                            (account['popularityPoints'] as int).toString(),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),

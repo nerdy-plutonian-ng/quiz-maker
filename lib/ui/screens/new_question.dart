@@ -109,7 +109,6 @@ class _NewQuestionScreenState extends State<NewQuestionScreen> {
                 Expanded(
                     flex: 2,
                     child: ControlBox(
-                      isMobile: deviceWidth <= AppDimensions.mobileWidth,
                       child: ListView(
                         children: [
                           if (deviceWidth <= AppDimensions.portraitTabletWidth)

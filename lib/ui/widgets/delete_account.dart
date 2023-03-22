@@ -31,13 +31,13 @@ class DeleteAccount extends StatelessWidget {
                             });
                             FirebaseFirestore.instance
                                 .collection('users')
-                                .doc(FirebaseAuth.instance.currentUser!.email!)
-                                .delete()
+                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                ?.delete()
                                 .then((_) {
                               FirebaseAuth.instance.currentUser
                                   ?.delete()
                                   .then((_) {
-                                context.pushReplacementNamed(RoutePaths.auth);
+                                context.pushReplacementNamed(RoutePaths.signIn);
                               }).catchError((error) {
                                 setTheState(() {
                                   isDeleting = false;
@@ -53,6 +53,7 @@ class DeleteAccount extends StatelessWidget {
                                     isError: true);
                               });
                             }).catchError((error) {
+                              print(error);
                               setTheState(() {
                                 isDeleting = false;
                               });
