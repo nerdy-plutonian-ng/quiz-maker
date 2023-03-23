@@ -2,10 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:quiz_maker/data/app_state/single_quiz_state.dart';
-import 'package:quiz_maker/data/constants/route_paths.dart';
 
 import '../utilities/messager.dart';
 
@@ -39,31 +35,15 @@ class _PlayWidgetState extends State<PlayWidget> {
       );
       return;
     }
-    final usersQuizzes =
-        FirebaseFirestore.instance.collection('users').doc(query);
-    usersQuizzes.get().then((docSnapshot) {
-      if (docSnapshot.exists) {
-        usersQuizzes.collection('quizzes').get().then((snapshot) {
-          setState(() {
-            docs = snapshot.docs;
-            isSearching = false;
-          });
-        }).catchError((error) {
-          setState(() {
-            isSearching = false;
-          });
-          Messager.showSnackBar(
-              context: context, message: error.toString(), isError: true);
-        });
-      } else {
-        setState(() {
-          isSearching = false;
-        });
-        Messager.showSnackBar(
-            context: context,
-            message: 'This user does not exist',
-            isError: true);
-      }
+    FirebaseFirestore.instance
+        .collection('users')
+        .where("username", isEqualTo: query.toLowerCase())
+        .get()
+        .then((snapshot) {
+      setState(() {
+        isSearching = false;
+        docs = snapshot.docs;
+      });
     });
   }
 
@@ -82,7 +62,7 @@ class _PlayWidgetState extends State<PlayWidget> {
           CupertinoSearchTextField(
             controller: controller,
             enabled: !isSearching,
-            placeholder: 'Email of quiz maker',
+            placeholder: 'Username of quiz maker',
             onSubmitted: (query) => searchUserQuizzes(query.toLowerCase()),
             onSuffixTap: () {
               setState(() {
@@ -109,7 +89,9 @@ class _PlayWidgetState extends State<PlayWidget> {
             Expanded(
                 child: ListView.builder(
               itemBuilder: (_, index) {
-                final quiz = docs![index].data() as Map<String, dynamic>;
+                final quizzes = (docs![index].data()
+                    as Map<String, dynamic>)['quizzes'] as List;
+                print(quizzes);
                 return Card(
                   key: UniqueKey(),
                   child: Padding(
@@ -119,7 +101,7 @@ class _PlayWidgetState extends State<PlayWidget> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          quiz['title'],
+                          quizzes[index]['title'],
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const Divider(),
@@ -127,17 +109,7 @@ class _PlayWidgetState extends State<PlayWidget> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             FilledButton.icon(
-                              onPressed: () {
-                                Provider.of<SingleQuizState>(context,
-                                        listen: false)
-                                    .reset();
-                                Provider.of<SingleQuizState>(context,
-                                        listen: false)
-                                    .setQuiz(quiz);
-                                context.pushNamed(
-                                  RoutePaths.playQuiz,
-                                );
-                              },
+                              onPressed: () {},
                               style: FilledButton.styleFrom(
                                   visualDensity: VisualDensity.compact),
                               icon: const Icon(Icons.play_circle_outline),

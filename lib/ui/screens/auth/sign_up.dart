@@ -36,7 +36,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           .then((userCredential) {
         final user = userCredential.user;
         if (user != null) {
-          user.updateDisplayName(registerObject['displayName']).then((value) {
+          user
+              .updateDisplayName(registerObject['displayName']?.toLowerCase())
+              .then((value) {
             user.sendEmailVerification().then((_) {
               setState(() {
                 isSubmitting = false;
