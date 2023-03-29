@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../data/constants/route_paths.dart';
 import '../utilities/messager.dart';
 
 class PlayWidget extends StatefulWidget {
@@ -109,21 +111,24 @@ class _PlayWidgetState extends State<PlayWidget> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             FilledButton.icon(
-                              onPressed: () {},
+                              onPressed: () {
+                                context.pushNamed(RoutePaths.prepQuiz,
+                                    queryParams: {'id': quizzes[index]['id']});
+                              },
                               style: FilledButton.styleFrom(
                                   visualDensity: VisualDensity.compact),
                               icon: const Icon(Icons.play_circle_outline),
                               label: const Text('Solo'),
                             ),
-                            const SizedBox(
-                              width: 8,
-                            ),
-                            FilledButton.tonalIcon(
-                                onPressed: () {},
-                                style: FilledButton.styleFrom(
-                                    visualDensity: VisualDensity.compact),
-                                icon: const Icon(Icons.play_circle_outline),
-                                label: const Text('Group')),
+                            // const SizedBox(
+                            //   width: 8,
+                            // ),
+                            // FilledButton.tonalIcon(
+                            //     onPressed: () {},
+                            //     style: FilledButton.styleFrom(
+                            //         visualDensity: VisualDensity.compact),
+                            //     icon: const Icon(Icons.play_circle_outline),
+                            //     label: const Text('Group')),
                           ],
                         ),
                       ],

@@ -8,4 +8,6 @@ class RoutePaths {
   static const forgotPassword = '/forgotPassword';
   static const sendEmailVerificationLink = '/sendEmailVerificationLink';
   static const quiz = 'quiz';
+  static const prepQuiz = 'prepQuiz';
+  static const soloQuiz = 'soloQuiz';
 }

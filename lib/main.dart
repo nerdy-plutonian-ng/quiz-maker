@@ -8,6 +8,7 @@ import 'package:quiz_maker/data/app_state/create_quiz_state.dart';
 import 'package:quiz_maker/data/app_state/quiz_state.dart';
 import 'package:quiz_maker/data/app_state/send_verification_timer_state.dart';
 import 'package:quiz_maker/data/app_state/single_quiz_state.dart';
+import 'package:quiz_maker/data/app_state/solo_quiz_state.dart';
 import 'package:quiz_maker/data/models/app_settings.dart';
 import 'package:quiz_maker/data/persistence/app_settings_prefs_saver.dart';
 import 'package:quiz_maker/ui/app_theme/color_schemes.g.dart';
@@ -35,6 +36,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => SendVerificationTimerState()),
       ChangeNotifierProvider(create: (_) => AppSettingsState()),
       ChangeNotifierProvider(create: (_) => QuizState()),
+      ChangeNotifierProvider(create: (_) => SoloQuizState()),
       ChangeNotifierProvider(create: (_) => CreateQuizState()),
       ChangeNotifierProvider(create: (_) => SingleQuizState()),
     ],

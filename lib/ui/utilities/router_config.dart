@@ -7,9 +7,12 @@ import 'package:quiz_maker/ui/screens/auth/verify_email.dart';
 import 'package:quiz_maker/ui/screens/home.dart';
 import 'package:quiz_maker/ui/screens/new_quiz.dart';
 import 'package:quiz_maker/ui/screens/play_quiz.dart';
+import 'package:quiz_maker/ui/screens/prep_screen.dart';
 import 'package:quiz_maker/ui/screens/quiz.dart';
+import 'package:quiz_maker/ui/screens/solo_quiz.dart';
 
 import '../../data/constants/route_paths.dart';
+import '../../data/models/quiz.dart';
 
 final routerConfig = GoRouter(
   routes: [
@@ -35,6 +38,21 @@ final routerConfig = GoRouter(
             path: RoutePaths.playQuiz,
             name: RoutePaths.playQuiz,
             builder: (_, routerState) => const PlayQuizWidget(),
+          ),
+          GoRoute(
+            path: RoutePaths.prepQuiz,
+            name: RoutePaths.prepQuiz,
+            builder: (_, routerState) => PrepScreen(
+              id: routerState.queryParams['id']!,
+            ),
+          ),
+          GoRoute(
+            path: RoutePaths.soloQuiz,
+            name: RoutePaths.soloQuiz,
+            builder: (_, routerState) => SoloQuiz(
+                quiz: routerState.extra as Quiz,
+                maker: routerState.queryParams['maker']!,
+                quizId: routerState.queryParams['quizId']!),
           ),
         ],
         redirect: (_, routerState) {
