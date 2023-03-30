@@ -8,6 +8,7 @@ import 'package:quiz_maker/data/constants/app_dimensions.dart';
 import 'package:quiz_maker/data/constants/route_paths.dart';
 import 'package:quiz_maker/ui/utilities/app_extensions.dart';
 import 'package:quiz_maker/ui/widgets/control_box.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../data/models/quiz.dart';
 import '../widgets/score_board.dart';
@@ -96,7 +97,15 @@ class _SoloQuizState extends State<SoloQuiz> {
                                 context.goNamed(RoutePaths.root);
                               },
                               icon: const Icon(Icons.home_outlined),
-                              label: const Text('Home'))
+                              label: const Text('Home')),
+                          TextButton.icon(
+                              onPressed: () {
+                                Share.share('com.plutoapps.quizmaker',
+                                    subject:
+                                        'See how much you score on this quiz');
+                              },
+                              icon: Icon(Icons.share),
+                              label: Text('Share'))
                         ],
                       ),
                     )

@@ -40,7 +40,7 @@ class _SignInScreenState extends State<SignInScreen> {
           if (user.emailVerified) {
             FirebaseFirestore.instance
                 .collection('users')
-                .doc(FirebaseAuth.instance.currentUser!.email)
+                .doc(FirebaseAuth.instance.currentUser!.uid)
                 .get()
                 .then((doc) {
               if (!doc.exists) {
